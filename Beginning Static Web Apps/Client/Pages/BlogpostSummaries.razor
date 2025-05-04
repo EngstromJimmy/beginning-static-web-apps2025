@@ -1,9 +1,17 @@
 ﻿@page "/blogposts"
 @inject BlogpostSummaryService service
 @inject NavigationManager navigationManager
+@implements IDisposable
+@inject BlogpostService blogpostService
+@inject NavigationManager navigationManager
 
 <PageTitle>Blog posts</PageTitle>
 <h1>Blog posts</h1>
+<AuthorizeView Roles="admin">
+    <Authorized>
+        <a href="blogposts/new">Create</a>
+    </Authorized>
+</AuthorizeView>
 
 @if (service.Summaries is null)
 {
@@ -14,6 +22,16 @@ else
     foreach (var blogpostSummary in service.Summaries.OrderByDescending(bps => bps.PublishedDate))
     {
         <BlogpostSummary Summary="@blogpostSummary" />
+        <AuthorizeView Roles="admin">
+            <Authorized>
+                <a href="blogposts/@blogpostSummary.Author/@blogpostSummary.Id/edit">Edit</a>
+                <a href="javascript:;"
+                   @onclick="() => blogpostService.Delete(blogpostSummary.Id, blogpostSummary.Author)">
+                    Delete
+                </a>
+            </Authorized>
+        </AuthorizeView>
+
     }
 }
 
@@ -23,5 +41,17 @@ else
     protected override async Task OnInitializedAsync()
     {
         await service.LoadBlogpostSummaries();
+        service.SummariesRefreshed += OnSummariesRefreshed;
     }
+
+    public void Dispose()
+    {
+        service.SummariesRefreshed -= OnSummariesRefreshed;
+    }
+
+    private void OnSummariesRefreshed(object? sender, EventArgs e)
+    {
+        StateHasChanged();
+    }
+
 }

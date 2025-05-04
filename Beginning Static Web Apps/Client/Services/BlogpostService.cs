@@ -2,11 +2,21 @@
 using System.Net.Http.Json;
 using Models;
 namespace Client.Services;
+using System.Text;
+using System.Text.Json;
+
 public class BlogpostService(HttpClient httpClient, NavigationManager navigationManager)
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly NavigationManager _navigationManager = navigationManager;
     private List<Blogpost> blogpostCache = new();
+    public event EventHandler? BlogpostChanged;
+    private void OnBlogpostsChanged()
+    {
+        BlogpostChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+
     public async Task<Blogpost?> GetBlogpost(Guid blogpostId, string author)
     {
         Blogpost? blogpost = blogpostCache.FirstOrDefault(bp => bp.Id == blogpostId && bp.Author == author);
@@ -29,6 +39,66 @@ public class BlogpostService(HttpClient httpClient, NavigationManager navigation
         return blogpost;
     }
 
+    public async Task<Blogpost> Create(Blogpost blogpost)
+    {
+        ArgumentNullException
+            .ThrowIfNull(blogpost, nameof(blogpost));
+
+        var result = await _httpClient
+            .PostAsJsonAsync("api/blogposts", blogpost);
+        result.EnsureSuccessStatusCode();
+
+        var savedBlogpost =
+            await result
+            .Content
+            .ReadFromJsonAsync<Blogpost>();
+
+        blogpostCache.Add(savedBlogpost!);
+        OnBlogpostsChanged();
+        return savedBlogpost!;
+    }
+
+    public async Task Update(Blogpost blogpost)
+    {
+        ArgumentNullException
+            .ThrowIfNull(blogpost, nameof(blogpost));
+
+        var result = await _httpClient
+            .PutAsJsonAsync("api/blogposts", blogpost);
+        result.EnsureSuccessStatusCode();
+        var updatedBlogPost = await result
+            .Content
+            .ReadFromJsonAsync<Blogpost>();
+
+        if (blogpostCache != null)
+        {
+            var index =
+                blogpostCache
+                    .FindIndex(
+                        b => b.Id == blogpost.Id
+                                && b.Author == blogpost.Author);
+            if (index >= 0)
+            {
+                blogpostCache[index] = updatedBlogPost!;
+            }
+        }
+
+        OnBlogpostsChanged();
+    }
+
+    public async Task Delete(Guid id, string author)
+    {
+        var deleteURL = $"api/blogposts/{author}/{id}";
+        var result = await
+            _httpClient.DeleteAsync(deleteURL);
+        result.EnsureSuccessStatusCode();
+
+        blogpostCache.RemoveAll(
+            blogpost => blogpost.Id == id
+                && blogpost.Author == author);
+
+        OnBlogpostsChanged();
+    }
 
 
 }

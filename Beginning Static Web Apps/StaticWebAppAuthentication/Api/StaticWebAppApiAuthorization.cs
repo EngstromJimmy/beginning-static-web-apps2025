@@ -18,7 +18,7 @@ public static class StaticWebAppApiAuthorization
 
         try
         {
-            var data = headers.FirstOrDefault(header => header.Key == "x-ms-client-principal");
+            var data = headers.FirstOrDefault(header => header.Key.ToLower() == "x-ms-client-principal");
             var decoded = Convert.FromBase64String(data.Value.First());
             var json = Encoding.UTF8.GetString(decoded);
 
