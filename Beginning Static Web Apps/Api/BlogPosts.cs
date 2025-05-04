@@ -91,7 +91,7 @@ namespace Api
             {
                 return new UnauthorizedResult();
             }
-            return new NotFoundObjectResult(blogpost);
+
             var database = client.GetDatabase("SwaBlog");
             var id = Guid.CreateVersion7();
             var author = clientPrincipal!.UserDetails!;
