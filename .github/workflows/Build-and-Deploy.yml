@@ -91,8 +91,9 @@ jobs:
             else
               echo "ENVIRONMENT=staging${{ github.event.number }}">>$GITHUB_OUTPUT
             fi
-            - name: Install Node
-            uses: actions/setup-node@v4
+
+        - name: Install Node
+          uses: actions/setup-node@v4
     
         - name: Install SWA CLI
           run:  npm install -g @azure/static-web-apps-cli
