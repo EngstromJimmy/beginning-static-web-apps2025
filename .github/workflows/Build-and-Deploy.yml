@@ -110,61 +110,63 @@ jobs:
                 --app-name ${{vars.SWA_NAME}} \
                 --resource-group ${{vars.RESOURCE_GROUP}} \
                 --config swa-cli.config.json
-                - name: Get Staging Hostname
-                uses: azure/CLI@v2
-                if: github.event_name == 'pull_request'
-                id: get-hostname
-                with:
-                  inlineScript: |
-                    SWA_HOSTNAME=$(az staticwebapp environment list \
-                      -n ${{vars.SWA_NAME}} \
-                      -g $${{vars.RESOURCE_GROUP}} \
-                      --query "[?contains(hostname,'${{ steps.swa-env.outputs.ENVIRONMENT }}')].hostname " \
-                      -o tsv)
-                    echo $SWA_HOSTNAME
-                    echo SWA_HOSTNAME=$SWA_HOSTNAME >> $GITHUB_OUTPUT
-        
-              - name: Update Pull Request
-                uses: actions/github-script@v7
-                if: github.event_name == 'pull_request'
-                with:
-                  github-token: ${{ secrets.GITHUB_TOKEN }}
-                  script: |
-                    const output = `#### Staging Environment Updated
-        
-                    Test here https://${{ steps.get-hostname.outputs.SWA_HOSTNAME }}
-        
-                    *Pushed by: @${{ github.actor }}*`;
-        
-                    github.rest.issues.createComment({
-                      issue_number: context.issue.number,
-                      owner: context.repo.owner,
-                      repo: context.repo.repo,
-                      body: output
-                    })
-                    if: github.event_name == 'pull_request' && github.event.action == 'closed'
-                    runs-on: ubuntu-latest
-                    name: Close Pull Request Job
-                    steps:
-                      - name: Azure login with OIDC
-                        uses: azure/login@v2
-                        with:
-                            client-id: ${{ secrets.AZURE_CLIENT_ID }}
-                            tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-                            subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-                            # We are forcing a different flow because of MSAL issues at time of writing
-                            enable-AzPSSession: false
-                            allow-no-subscriptions: true 
-                        
-                      - name: Remove Staging Environment
-                        id: get-api-key
-                        uses: azure/CLI@v2
-                        with:
-                          azcliversion: latest
-                          inlineScript: |
-                            az staticwebapp environment delete \
-                              --name ${{vars.SWA_NAME}} \
-                              --resource-group ${{vars.RESOURCE_GROUP}} \
-                              --environment-name staging${{ github.event.number }} \
-                              --yes
-                
+
+        - name: Get Staging Hostname
+          uses: azure/CLI@v2
+          if: github.event_name == 'pull_request'
+          id: get-hostname
+          with:
+             inlineScript: |
+                SWA_HOSTNAME=$(az staticwebapp environment list \
+                    -n ${{vars.SWA_NAME}} \
+                    -g $${{vars.RESOURCE_GROUP}} \
+                    --query "[?contains(hostname,'${{ steps.swa-env.outputs.ENVIRONMENT }}')].hostname " \
+                    -o tsv)
+                echo $SWA_HOSTNAME
+                echo SWA_HOSTNAME=$SWA_HOSTNAME >> $GITHUB_OUTPUT
+    
+        - name: Update Pull Request
+          uses: actions/github-script@v7
+          if: github.event_name == 'pull_request'
+          with:
+            github-token: ${{ secrets.GITHUB_TOKEN }}
+            script: |
+              const output = `#### Staging Environment Updated
+
+              Test here https://${{ steps.get-hostname.outputs.SWA_HOSTNAME }}
+
+              *Pushed by: @${{ github.actor }}*`;
+
+              github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: output
+              })
+
+  close_pull_request_job:
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    name: Close Pull Request Job
+    steps:
+      - name: Azure login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          # We are forcing a different flow because of MSAL issues at time of writing
+          enable-AzPSSession: false
+          allow-no-subscriptions: true 
+
+      - name: Remove Staging Environment
+        id: get-api-key
+        uses: azure/CLI@v2
+        with:
+           azcliversion: latest
+           inlineScript: |
+            az staticwebapp environment delete \
+            --name ${{vars.SWA_NAME}} \
+            --resource-group ${{vars.RESOURCE_GROUP}} \
+            --environment-name staging${{ github.event.number }} \
+            --yes
