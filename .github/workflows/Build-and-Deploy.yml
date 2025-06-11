@@ -30,10 +30,10 @@ jobs:
           include-prerelease: false
           
       - name: Client Build
-        run: dotnet publish ./Beginning Static Web Apps/Client/Client.csproj --output ./dist/client
+        run: dotnet publish "./Beginning Static Web Apps/Client/Client.csproj" --output ./dist/client
 
       - name: Api Build
-        run: dotnet publish ./Beginning Static Web Apps/Api/Api.csproj --output ./dist/api
+        run: dotnet publish "./Beginning Static Web Apps/Api/Api.csproj" --output ./dist/api
     
     #   When you add tests this line will ensure that 
     #      they are ran as part of your pipeline
