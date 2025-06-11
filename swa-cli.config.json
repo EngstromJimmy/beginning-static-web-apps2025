@@ -12,5 +12,14 @@
          "debug": {
               "appDevserverUrl": "http://localhost:7001"
          }
-    }
+    },
+        "deploy-config": {
+               "appLocation": "./dist/client/wwwroot",
+               "apiLocation": "./dist/api",
+               "outputLocation": ".",
+               "apiLanguage": "dotnetisolated",
+               "apiVersion": "9.0",
+               "apiBuildCommand": "dotnet publish -c Release"
+        }    
+
 }
