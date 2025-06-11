@@ -100,15 +100,15 @@ jobs:
     
         - name: Deploy Artifacts to SWA
           env:
-              SWA_CLI_APP_NAME: ${{vars.SWA_NAME}}
-              SWA_CLI_RESOURCE_GROUP: ${{vars.RESOURCE_GROUP}}
+              SWA_CLI_APP_NAME: ${{ vars.SWA_NAME }}
+              SWA_CLI_RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
               SWA_NON_INTERACTIVE: true
           run: |
               swa deploy \
                 --deployment-token ${{ steps.swa-secret.outputs.SWA_SECRET }} \
                 --env ${{ steps.swa-env.outputs.ENVIRONMENT }} \
-                --app-name ${{vars.SWA_NAME}} \
-                --resource-group ${{vars.RESOURCE_GROUP}} \
+                --app-name ${{ vars.SWA_NAME }} \
+                --resource-group ${{ vars.RESOURCE_GROUP }} \
                 --config swa-cli.config.json
 
         - name: Get Staging Hostname
@@ -118,8 +118,8 @@ jobs:
           with:
              inlineScript: |
                 SWA_HOSTNAME=$(az staticwebapp environment list \
-                    -n ${{vars.SWA_NAME}} \
-                    -g $${{vars.RESOURCE_GROUP}} \
+                    -n ${{ vars.SWA_NAME }} \
+                    -g ${{ vars.RESOURCE_GROUP }} \
                     --query "[?contains(hostname,'${{ steps.swa-env.outputs.ENVIRONMENT }}')].hostname " \
                     -o tsv)
                 echo $SWA_HOSTNAME
@@ -166,7 +166,7 @@ jobs:
            azcliversion: latest
            inlineScript: |
             az staticwebapp environment delete \
-            --name ${{vars.SWA_NAME}} \
-            --resource-group ${{vars.RESOURCE_GROUP}} \
+            --name ${{ vars.SWA_NAME }} \
+            --resource-group ${{ vars.RESOURCE_GROUP }} \
             --environment-name staging${{ github.event.number }} \
             --yes
