@@ -2,7 +2,7 @@
     "configurations": {
          "static": {
               "appLocation": "./dist/wwwroot",
-              "apiLocation": "./Api"
+              "apiLocation": "./api"
          },
          "run-all": {
               "appDevserverUrl": "http://localhost:7001",
