@@ -1,7 +1,7 @@
 ﻿@page "/"
 @using Models
 @inject BlogpostSummaryService service
-
+<h1>Beginning Static Web Apps</h1>
 @if (service.Summaries == null)
 {
     <div>Loading...</div>
@@ -9,7 +9,7 @@
 else
 {
     <div>
-        <h2>Recent Blog Post</h2>
+        <h2>The most recent blogpost</h2>
         @if (Summary == null)
         {
             <p class="byline">No blog posts found   </p>
