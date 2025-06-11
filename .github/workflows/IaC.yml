@@ -42,7 +42,7 @@ jobs:
             az staticwebapp appsettings set \
               --name ${{vars.SWA_NAME}} \
               --resource-group ${{vars.RESOURCE_GROUP}} \
-              --setting-name CosmosDbConnectionString="${{secrets.COSMOS_CONECTION_STRING}}"
+              --setting-name CosmosDbConnectionString="${{secrets.COSMOS_CONNECTION_STRING}}"
             az staticwebapp dbconnection create \
               --name ${{vars.SWA_NAME}} \
               --resource-group ${{vars.RESOURCE_GROUP}} \
