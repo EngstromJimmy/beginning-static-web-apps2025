@@ -104,7 +104,7 @@ jobs:
               SWA_CLI_RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
               SWA_NON_INTERACTIVE: true
           run: |
-            swa deploy-config deploy \
+            swa deploy deploy-config\
                 --deployment-token ${{ steps.swa-secret.outputs.SWA_SECRET }} \
                 --env ${{ steps.swa-env.outputs.ENVIRONMENT }} \
                 --app-name ${{ vars.SWA_NAME }} \
