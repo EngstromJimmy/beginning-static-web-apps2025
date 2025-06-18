@@ -107,6 +107,18 @@ jobs:
                 
                 echo "Apex alias A record created successfully"
             fi
+
+      - name: Verify www CNAME is live
+        run: |
+            echo "Waiting for DNS to resolve..."
+            sleep 30
+            cname=$(dig +short www.$DOMAIN CNAME)
+            echo "Resolved CNAME: $cname"
+            if [ "$cname" != "$SWA_HOSTNAME." ]; then
+            echo "❌ CNAME mismatch: expected $SWA_HOSTNAME but got $cname"
+            exit 1
+            fi
+       
       - name: Set Subdomain Hostname
         run: |
             az staticwebapp hostname set -n "$SWA_NAME" -g "$RESOURCE_GROUP" --hostname www.$DOMAIN --no-wait
