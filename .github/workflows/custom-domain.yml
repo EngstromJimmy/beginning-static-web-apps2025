@@ -86,8 +86,7 @@ jobs:
                 echo "Apex alias A record already points to Static Web App - skipping"
             else
                 # Remove any existing A record (whether alias or regular IP-based)
-                if az network dns record-set a show --resource-group 
-                            "$DNS_RESOURCE_GROUP" --zone-name "$DOMAIN" --name "@" >/dev/null 2>&1; then
+                if az network dns record-set a show --resource-group "$DNS_RESOURCE_GROUP" --zone-name "$DOMAIN" --name "@" >/dev/null 2>&1; then
                     echo " Replacing existing apex A record with alias A record"
                     az network dns record-set a delete \
                         --resource-group "$DNS_RESOURCE_GROUP" \
@@ -138,8 +137,7 @@ jobs:
                     --query "validationToken" \
                     -o tsv 2>/dev/null || echo "")
                 
-                if [ -n "$VALIDATION_TOKEN" ] &&  
-                        [ "$VALIDATION_TOKEN" != "null" ]; then
+                if [ -n "$VALIDATION_TOKEN" ] && [ "$VALIDATION_TOKEN" != "null" ]; then
                     echo "Validation token retrieved: $VALIDATION_TOKEN"
                     break
                 fi
@@ -157,38 +155,38 @@ jobs:
             
       - name: Create TXT Record in Azure DNS
         run: |
-                echo "Setting up TXT record for domain validation..."
-    
-                # Check if TXT record already exists and contains our validation token
-                existing_tokens=$(az network dns record-set txt show \
-                    --resource-group "$DNS_RESOURCE_GROUP" \
-                    --zone-name "$DOMAIN" \
-                    --name "@" \
-                    --query "txtRecords[].value[]" -o tsv 2>/dev/null || echo "")
-    
-                if echo "$existing_tokens" | grep -q "^$VALIDATION_TOKEN$"; then
-                    echo "TXT record already contains validation token - skipping"
-                else
-                    if [ -n "$existing_tokens" ]; then
-                        echo "TXT record exists but doesn't contain our validation token"
-                        echo "Adding validation token to existing TXT records"
-                        echo "Existing tokens will be preserved"
-                    else
-                        echo "Creating new TXT record with validation token..."
-                    fi
-                    
-                    az network dns record-set txt add-record \
+                    echo "Setting up TXT record for domain validation..."
+        
+                    # Check if TXT record already exists and contains our validation token
+                    existing_tokens=$(az network dns record-set txt show \
                         --resource-group "$DNS_RESOURCE_GROUP" \
                         --zone-name "$DOMAIN" \
-                        --record-set-name "@" \
-                        --value "$VALIDATION_TOKEN"
-                    
-                    echo "TXT record updated successfully"
-                    
-                    # Show current TXT records for transparency
-                    if [ -n "$existing_tokens" ]; then
-                        echo ""
-                        echo "If recreating an existing SWA, you may want to manually remove old validation tokens"
-                        echo " Only remove tokens you recognize as belonging to your previous SWA deployments"
+                        --name "@" \
+                        --query "txtRecords[].value[]" -o tsv 2>/dev/null || echo "")
+        
+                    if echo "$existing_tokens" | grep -q "^$VALIDATION_TOKEN$"; then
+                        echo "TXT record already contains validation token - skipping"
+                    else
+                        if [ -n "$existing_tokens" ]; then
+                            echo "TXT record exists but doesn't contain our validation token"
+                            echo "Adding validation token to existing TXT records"
+                            echo "Existing tokens will be preserved"
+                        else
+                            echo "Creating new TXT record with validation token..."
+                        fi
+                        
+                        az network dns record-set txt add-record \
+                            --resource-group "$DNS_RESOURCE_GROUP" \
+                            --zone-name "$DOMAIN" \
+                            --record-set-name "@" \
+                            --value "$VALIDATION_TOKEN"
+                        
+                        echo "TXT record updated successfully"
+                        
+                        # Show current TXT records for transparency
+                        if [ -n "$existing_tokens" ]; then
+                            echo ""
+                            echo "If recreating an existing SWA, you may want to manually remove old validation tokens"
+                            echo " Only remove tokens you recognize as belonging to your previous SWA deployments"
+                        fi
                     fi
-                fi
