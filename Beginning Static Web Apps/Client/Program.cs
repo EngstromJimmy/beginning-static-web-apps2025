@@ -4,7 +4,7 @@ using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using StaticWebAppAuthentication.Client;
+using StacyClouds.SwaAuth.Client;
 using System.Text.Json;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
