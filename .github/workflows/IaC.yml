@@ -38,7 +38,7 @@ jobs:
               --resource-group ${{vars.RESOURCE_GROUP}} \
               --template-file main.bicep \
               --parameters name=${{vars.SWA_NAME}} \
-              sku=standard --debug
+              sku=standard 
             az staticwebapp appsettings set \
               --name ${{vars.SWA_NAME}} \
               --resource-group ${{vars.RESOURCE_GROUP}} \
