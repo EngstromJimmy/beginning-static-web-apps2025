@@ -24,7 +24,7 @@ namespace Api
 
         private static (bool Authorized, ClientPrincipal? ClientPrincipal) IsAuthorized(HttpRequestData req)
         {
-            if (StaticWebAppApiAuthorization.TryParseHttpHeaderForClientPrincipal(req.Headers, out var clientPrincipal)
+            if (StaticWebAppApiAuthentication.TryParseHttpHeaderForClientPrincipal(req.Headers, out var clientPrincipal)
                 && !string.IsNullOrWhiteSpace(clientPrincipal!.UserDetails))
             {
                 return (true, clientPrincipal);
