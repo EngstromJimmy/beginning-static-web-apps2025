@@ -34,7 +34,8 @@
     "exclude": [
       "/images/*.{png,jpg,gif}",
       "/css/*",
-      "/api/*"
+      "/api/*",
+      "/.auth/*"
     ]
   }
 }
