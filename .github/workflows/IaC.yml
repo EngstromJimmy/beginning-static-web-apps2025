@@ -42,9 +42,10 @@ jobs:
             az staticwebapp appsettings set \
               --name ${{vars.SWA_NAME}} \
               --resource-group ${{vars.RESOURCE_GROUP}} \
-              --setting-name CosmosDbConnectionString="${{ secrets.COSMOS_CONNECTION_STRING}}" \
-              --setting-name AUTH_KEY="test" \
-              --setting-name AUTH_ID="${{ secrets.AUTH_ID}}"\
+             --setting-names \
+              CosmosDbConnectionString="${{ secrets.COSMOS_CONNECTION_STRING }}" \
+              AUTH_SECRET="${{ secrets.AUTH_SECRET }}" \
+              AUTH_ID="${{ secrets.AUTH_ID }}" \
               --debug
             az staticwebapp dbconnection create \
               --name ${{vars.SWA_NAME}} \
