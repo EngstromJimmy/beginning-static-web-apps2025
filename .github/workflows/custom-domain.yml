@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:   
       DNS_RESOURCE_GROUP: swa-for-beginners-iac-rg  # Replace with your DNS Resource Group
-      DOMAIN: blazorlive.net # Replace with your domain name
+      DOMAIN: blazorlive.com # Replace with your domain name
       SWA_NAME: ${{ vars.SWA_NAME }}
       RESOURCE_GROUP: ${{ vars.RESOURCE_GROUP }}
 
